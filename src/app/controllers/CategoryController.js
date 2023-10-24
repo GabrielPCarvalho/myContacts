@@ -7,6 +7,8 @@ class CategoryController {
     response.json(categories);
   }
 
+  // Error Handler (Middlewer express) -> Manipular de erros
+
   async store(request, response) {
     const { name } = request.body;
 
