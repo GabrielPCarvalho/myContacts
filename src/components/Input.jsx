@@ -6,12 +6,13 @@ export default styled.input`
   border: none;
   background: #fff;
   border: 2px solid #fff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   border-radius: 4px;
   outline: none;
   padding: 0 16px;
   font-size: 16px;
   transition: border-color 0.2s ease-in;
+  appearance: none;
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary.main};
