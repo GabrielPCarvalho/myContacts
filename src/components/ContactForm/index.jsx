@@ -12,12 +12,14 @@ import useErrors from '../../hooks/useErrors';
 
 
 
-const ContactForm = ({ buttonLabel }) => {
+const ContactForm = ({ buttonLabel, onSubmit }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
   const {
     setError,
     getErrorMessageByFieldName,
@@ -49,6 +51,13 @@ const ContactForm = ({ buttonLabel }) => {
 
   function handleSubmit(e) {
     e.preventDefault();
+
+    onSubmit({
+      name,
+      email,
+      phone,
+      categoryId
+    })
   }
 
   function handlePhoneChange(e) {
@@ -57,8 +66,13 @@ const ContactForm = ({ buttonLabel }) => {
 
   useEffect(() => {
     async function loadCategories() {
-      const categories = await CategoriesService.listCategories();
-      setCategories(categories);
+      try {
+        const categories = await CategoriesService.listCategories();
+
+        setCategories(categories);
+      } catch {} finally {
+        setIsLoadingCategories(false);
+      }
     }
 
     loadCategories();
@@ -94,10 +108,11 @@ const ContactForm = ({ buttonLabel }) => {
         />
       </FormGroup>
 
-      <FormGroup>
+      <FormGroup isLoading={isLoadingCategories}>
         <Select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
+          disabled={isLoadingCategories}
         >
           <option value=''>Sem categoria</option>
 
@@ -106,7 +121,6 @@ const ContactForm = ({ buttonLabel }) => {
               {category.name}
             </option>
           ))}
-
         </Select>
       </FormGroup>
 
@@ -120,7 +134,8 @@ const ContactForm = ({ buttonLabel }) => {
 }
 
 ContactForm.propTypes = {
-  buttonLabel: PropTypes.string.isRequired
+  buttonLabel: PropTypes.string.isRequired,
+  onSubmit: PropTypes.func.isRequired
 }
 
 export default ContactForm;
