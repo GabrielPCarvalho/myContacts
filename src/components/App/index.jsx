@@ -7,12 +7,14 @@ import GlobalStyles from '../../assets/styles/global';
 import { Container } from './styles';
 import Header from '../Header';
 import Routes from '../../routes.jsx';
+import ToastContainer from '../Toast/ToastContainer';
 
 const App = () => {
   return (
     <BrowserRouter>
       <ThemeProvider theme={defaultTheme}>
         <GlobalStyles />
+        <ToastContainer />
         <Container>
           <Header />
           <Routes />

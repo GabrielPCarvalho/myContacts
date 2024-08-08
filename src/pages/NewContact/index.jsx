@@ -1,22 +1,29 @@
 import PageHeader from "../../components/PageHeader"
 import ContactForm from "../../components/ContactForm"
 import ContactsServices from "../../services/ContactsServices"
+import toast from "../../utils/toast"
 
 const NewContact = () => {
   async function handleSubmit(formData) {
     try {
-    const contact = {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      category_id: formData.categoryId
-    };
+      const contact = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        category_id: formData.categoryId
+      };
 
-    const response = await ContactsServices.createContact(contact);
+      await ContactsServices.createContact(contact);
 
-    console.log(response)
+      toast({
+        type: "success",
+        text: "Contato cadastrado com sucesso!"
+      })
     } catch {
-      alert('Ocorreu um erro ao cadastrar o contato')
+      toast({
+      type: "danger",
+      text: "Ocorreu um erro ao cadastrar o contato!"
+    })
     }
   }
 
