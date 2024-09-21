@@ -1,19 +1,21 @@
 import { Overlay } from "./styes";
-import ReactDom from "react-dom";
 import PropTypes from "prop-types";
 import Spinner from "../Spinner";
+import ReactPortal from "../ReactPortal";
+
 
 const Loader = ({ isLoading }) => {
   if(!isLoading) {
     return null;
   }
 
-  return ReactDom.createPortal(
-    <Overlay>
+  return (
+    <ReactPortal containerId='loader-root'>
+      <Overlay>
       <Spinner size={90} />
     </Overlay>,
-    document.getElementById('loader-root')
-  );
+    </ReactPortal>
+  )
 }
 
 Loader.propTypes = {

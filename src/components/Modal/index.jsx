@@ -1,7 +1,7 @@
 import { Overlay, Container, Footer } from "./styles";
 import PropTypes from "prop-types";
-import ReactDom from "react-dom";
 import Button from "../Button";
+import ReactPortal from "../ReactPortal";
 
 
 const Modal = ({
@@ -20,8 +20,9 @@ const Modal = ({
     return null;
   }
 
-  return ReactDom.createPortal(
-    <Overlay>
+  return (
+    <ReactPortal containerId="modal-root">
+      <Overlay>
       <Container danger={danger}>
         <h1>{title}</h1>
         <div className="modal-body">
@@ -47,8 +48,8 @@ const Modal = ({
           </Button>
         </Footer>
       </Container>
-    </Overlay>,
-    document.getElementById('modal-root')
+    </Overlay>
+    </ReactPortal>
   )
 
 }
