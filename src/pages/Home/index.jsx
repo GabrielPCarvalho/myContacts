@@ -7,9 +7,14 @@ import trash from '../../assets/images/icons/trash.svg'
 import emptyBox from '../../assets/images/emptyBox.svg'
 import magnifierQuestion from '../../assets/images/magnifierQuestion.svg'
 import sad from '../../assets/images/sad.svg'
+
 import Loader from '../../components/Loader';
 import Button from '../../components/Button';
+import Modal from '../../components/Modal';
+
 import ContactsServices from '../../services/ContactsServices';
+import toast from '../../utils/toast';
+
 
 const Home = () => {
   const [contacts, setContacts] = useState([]);
@@ -17,6 +22,9 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible ] = useState(false);
+  const [contactBeingDeleted, setContactBeingDeleted] = useState(null);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
 
   const filteredContacts = useMemo(() => contacts?.filter((contact) => (
     contact.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -55,6 +63,41 @@ const Home = () => {
     loadContacts();
   }
 
+  function handleDeleteContact(contact) {
+    setContactBeingDeleted(contact);
+    setIsDeleteModalVisible(true);
+  }
+
+  function handleCloseDeleteModal() {
+    setIsDeleteModalVisible(false);
+    setContactBeingDeleted(null);
+  }
+
+  async function handleConfirmDeleteContact() {
+    try {
+      setIsLoadingDelete(true);
+
+      await ContactsServices.deleteContact(contactBeingDeleted.id);
+
+      setContacts((prevState) => prevState.filter((contact) => contact.id !== contactBeingDeleted.id));
+
+      handleCloseDeleteModal();
+
+      toast({
+        type: 'success',
+        text: 'Contato deletado com sucesso!',
+      });
+    } catch {
+      toast({
+        type: 'danger',
+        text: 'Ocorreu um erro ao deletar o contato!',
+      });
+    } finally {
+      setIsLoadingDelete(false);
+      handleCloseDeleteModal();
+    }
+  }
+
   // SOP -> Same Origin Policy -> Política de mesma origem (apenas em navegadores)
   // CORS -> Cross-Origin Resource Sharing -> Compartilhamento de recursos de origens cruzadas
   // Origem: protocolo//domínio:porta
@@ -67,6 +110,18 @@ const Home = () => {
   return (
     <Container>
       <Loader isLoading={isLoading} />
+
+      <Modal
+        danger
+        isLoading={isLoadingDelete}
+        visible={isDeleteModalVisible}
+        title={`Tem certeza que deseja remover o contato "${contactBeingDeleted?.name}"?`}
+        confirmLabel="Deletar"
+        onCancel={handleCloseDeleteModal}
+        onConfirm={handleConfirmDeleteContact}
+      >
+        <p>Esta ação não poderá ser desfeita!</p>
+      </Modal>
 
       {contacts.length > 0 && (
         <InputSearchContainer>
@@ -163,7 +218,10 @@ const Home = () => {
                   <a href={`/edit/${contact.id}`}>
                     <img src={edit} alt="Edit" />
                   </a>
-                  <button type='button'>
+                  <button
+                    type='button'
+                    onClick={() => handleDeleteContact(contact)}
+                  >
                     <img src={trash} alt="Delete" />
                   </button>
                 </div>

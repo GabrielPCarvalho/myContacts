@@ -6,19 +6,34 @@ class HttpClient {
     this.baseURL = baseURL;
   }
 
-  async get(path, options) {
+  get(path, options) {
     return this.makeRequest(path, {
       method: 'GET',
       headers: options?.headers,
     });
   }
 
-  async post(path, options) {
+  post(path, options) {
     return this.makeRequest(path, {
       method: 'POST',
       body: options?.body,
       headers: options?.headers,
-    })
+    });
+  }
+
+  put(path, options) {
+    return this.makeRequest(path, {
+      method: 'PUT',
+      body: options?.body,
+      headers: options?.headers,
+    });
+  }
+
+  delete(path, options) {
+    return this.makeRequest(path, {
+      method: 'DELETE',
+      headers: options?.headers,
+    });
   }
 
   async makeRequest(path, options) {
@@ -48,7 +63,7 @@ class HttpClient {
 
     let responseBody = null;
     const contentType = response.headers.get('Content-Type');
-    if(contentType.includes('application/json')) {
+    if(contentType?.includes('application/json')) {
       responseBody = await response.json();
     }
 

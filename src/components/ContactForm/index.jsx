@@ -1,4 +1,9 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import {
+  useEffect,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { Form, ButtonContainer } from './styles';
 import PropTypes from 'prop-types';
 import FormGroup from "../FormGroup"
@@ -11,7 +16,6 @@ import formatPhone from '../../utils/formatPhone';
 import useErrors from '../../hooks/useErrors';
 
 const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, ref) {
-  console.log({ref})
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -20,26 +24,29 @@ const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, r
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useImperativeHandle(ref, () => {
-    return {
-      setFieldsValues: (contact) => {
-        setName(contact.name);
-        setEmail(contact.email);
-        setPhone(contact.phone);
-        setCategoryId(contact.category_Id);
-      }
-    }
-  })
-
-
   const {
+    errors,
     setError,
-    getErrorMessageByFieldName,
     removeError,
-    errors
+    getErrorMessageByFieldName,
   } = useErrors();
 
   const isFormValid = (name && errors.length === 0);
+
+  useImperativeHandle(ref, () => ({
+      setFieldsValues: (contact) => {
+        setName(contact.name ?? '');
+        setEmail(contact.email ?? '');
+        setPhone(formatPhone(contact.phone) ?? '');
+        setCategoryId(contact.categoryId ?? '');
+      },
+      resetFields: () => {
+      setName('');
+      setEmail('');
+      setPhone('');
+      setCategoryId('');
+    },
+  }), []);
 
   function handleNameChange(e){
     setName(e.target.value)
@@ -61,6 +68,10 @@ const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, r
     }
   }
 
+  function handlePhoneChange(e) {
+    setPhone(formatPhone(e.target.value));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -74,15 +85,6 @@ const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, r
     });
 
     setIsSubmitting(false);
-
-    setName('');
-    setEmail('');
-    setPhone('');
-    setCategoryId('');
-  }
-
-  function handlePhoneChange(e) {
-    setPhone(formatPhone(e.target.value));
   }
 
   useEffect(() => {
@@ -163,7 +165,7 @@ const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, r
 
 ContactForm.propTypes = {
   buttonLabel: PropTypes.string.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  onSubmit: PropTypes.func.isRequired,
 }
 
 export default ContactForm;
