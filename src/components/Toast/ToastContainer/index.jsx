@@ -8,7 +8,6 @@ export default function ToastContainer() {
 
   useEffect(() => {
     function handleAddToast({ type, text, duration }) {
-
       setMessages((prevState) => [
         ...prevState,
         {
@@ -16,12 +15,12 @@ export default function ToastContainer() {
           type,
           text,
           duration
-        }
-
-      ])
+        },
+      ]);
     }
 
     toastEventManager.on('addtoast', handleAddToast)
+
     return () => {
       toastEventManager.removeListener('addtoast', handleAddToast)
     }

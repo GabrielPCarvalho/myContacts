@@ -10,18 +10,22 @@ import FormGroup from "../FormGroup"
 import Input from "../Input"
 import Select from "../Select"
 import Button from "../Button"
+
 import CategoriesService from '../../services/CategoriesService';
+
 import isEmailValid from '../../utils/isEmailValid';
 import formatPhone from '../../utils/formatPhone';
+
 import useErrors from '../../hooks/useErrors';
+import useSafeAsyncState from '../../hooks/useSafeAsyncState';
 
 const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, ref) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [categoryId, setCategoryId] = useState('');
-  const [categories, setCategories] = useState([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [categories, setCategories] = useSafeAsyncState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useSafeAsyncState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -99,7 +103,7 @@ const ContactForm = forwardRef(function ContactForm({ buttonLabel, onSubmit }, r
     }
 
     loadCategories();
-  },[]);
+  },[setCategories, setIsLoadingCategories]);
 
   return (
     <Form method='post' onSubmit={handleSubmit} noValidate>

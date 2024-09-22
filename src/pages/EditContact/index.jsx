@@ -6,7 +6,10 @@ import ContactForm from "../../components/ContactForm"
 import Loader from "../../components/Loader"
 
 import ContactsService from "../../services/ContactsServices"
+
 import toast from "../../utils/toast"
+
+import useSafeAsyncAction from "../../hooks/useSafeAsyncAction"
 
 const EditContact = () => {
   const [contactName, setContactName] = useState({});
@@ -16,28 +19,7 @@ const EditContact = () => {
 
   const { id } = useParams();
   const history = useHistory();
-
-  useEffect(() => {
-    async function loadContact() {
-      try {
-        const contact = await ContactsService.getContactById(
-          id,
-        )
-
-        contactFormRef.current.setFieldsValues(contact)
-        setIsLoading(false)
-        setContactName(contact.name);
-      } catch {
-        history.push('/')
-        toast({
-          type: 'danger',
-          text: 'Contato nao encontrado'
-        })
-      }
-    }
-
-    loadContact();
-  },[id, history]);
+  const safeAsyncAction = useSafeAsyncAction()
 
   async function handleSubmit(formData) {
     try {
@@ -64,10 +46,38 @@ const EditContact = () => {
     }
   }
 
+  useEffect(() => {
+    async function loadContact() {
+      try {
+        const contact = await ContactsService.getContactById(
+          id,
+        )
+
+        safeAsyncAction(() => {
+          contactFormRef.current.setFieldsValues(contact)
+          setIsLoading(false)
+          setContactName(contact.name);
+        })
+      } catch {
+        safeAsyncAction(() => {
+          history.push('/')
+          toast({
+            type: 'danger',
+            text: 'Contato nao encontrado'
+          })
+        })
+      }
+    }
+
+    loadContact();
+  },[id, history, safeAsyncAction]);
+
   return (
     <>
       <Loader isLoading={isLoading} />
+
       <PageHeader title={isLoading ? "Carregando ..." : `Editar ${contactName}`} />
+
       <ContactForm
         ref={contactFormRef}
         buttonLabel="Salvar alterações"
