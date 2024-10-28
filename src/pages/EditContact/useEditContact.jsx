@@ -26,12 +26,15 @@ export default function useEditContact() {
 
       toast({
         type: "success",
-        text: "Contato editado com sucesso!"
+        text: "Contato editado com sucesso!",
+        duration: 3000
       })
     } catch {
       toast({
         type: "danger",
-        text: "Ocorreu um erro ao editar o contato!"
+        text: "Ocorreu um erro ao editar o contato!",
+        duration: 3000
+
       })
     }
   }
@@ -53,7 +56,8 @@ export default function useEditContact() {
           history.push('/')
           toast({
             type: 'danger',
-            text: 'Contato nao encontrado'
+            text: 'Contato nao encontrado',
+            duration: 3000
           })
         })
       }

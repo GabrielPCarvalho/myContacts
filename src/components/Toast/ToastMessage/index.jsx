@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, memo } from 'react';
 
 import { Container } from './styles';
 
@@ -7,29 +7,7 @@ import PropTypes from 'prop-types';
 import xCircleIcon from '../../../assets/images/icons/x-circle.svg';
 import checkCircleIcon from "../../../assets/images/icons/check-circle.svg";
 
-export function ToastMessage({  message, onRemoveMessage, isLeaving, onAnimationEnd}) {
-  const animatedElementRef = useRef(null);
-
-  function handleRemoveToast() {
-    onRemoveMessage(message.id);
-  }
-
-  useEffect(() => {
-    function handleAnimationEnd() {
-      onAnimationEnd(message.id);
-    }
-
-    const elementRef = animatedElementRef.current;
-
-    if(!isLeaving) {
-      elementRef.addEventListener('animationend', handleAnimationEnd);
-    }
-
-    return () => {
-      elementRef.removeEventListener('animationend', handleAnimationEnd);
-    }
-  },[isLeaving, onAnimationEnd, message.id]);
-
+function ToastMessage({  message, onRemoveMessage, isLeaving, animatedRef}) {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       onRemoveMessage(message.id);
@@ -40,6 +18,10 @@ export function ToastMessage({  message, onRemoveMessage, isLeaving, onAnimation
     }
   },[message, onRemoveMessage]);
 
+  function handleRemoveToast() {
+    onRemoveMessage(message.id);
+  }
+
   return (
     <Container
       type={message.type}
@@ -47,7 +29,7 @@ export function ToastMessage({  message, onRemoveMessage, isLeaving, onAnimation
       tabIndex={0}
       role='button'
       isLeaving={isLeaving}
-      ref={animatedElementRef}
+      ref={animatedRef}
     >
       {message.type === "danger" && <img src={xCircleIcon} alt="Error" />}
       {message.type === "success" && <img src={checkCircleIcon} alt="Success" />}
@@ -65,5 +47,7 @@ ToastMessage.propTypes = {
   }).isRequired,
   onRemoveMessage: PropTypes.func.isRequired,
   isLeaving: PropTypes.bool.isRequired,
-  onAnimationEnd: PropTypes.func.isRequired
+  animatedRef: PropTypes.shape().isRequired,
 }
+
+export default memo(ToastMessage);
